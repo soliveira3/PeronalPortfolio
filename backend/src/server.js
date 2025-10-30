@@ -25,6 +25,10 @@ app.use(rateLimiter);
 
 
 // Routes
+app.get('/', (req, res) => {
+    res.send('API is running');
+});
+
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
 });
