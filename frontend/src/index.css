@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: 'Neue Montreal';
+}
+
+.font-neue {
+    font-family: 'Neue Montreal';
+}
+
+@layer base {
+    body {
+        @apply bg-gray-50 text-gray-900;
+    }
+}
+
+@layer utilities {
+    .animate-bounce-slow {
+        animation: bounce 3s infinite;
+    }
+}
