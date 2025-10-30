@@ -25,13 +25,14 @@ app.use(rateLimiter);
 
 
 // Routes
-app.get('/', (req, res) => {
-    res.send('API is running');
-});
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'OK', message: 'Server is running' });
-});
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    });
+}
+
 
 app.post('/api/compile', cowBasicCompiler)
 app.post('/api/pieceItTogether', pieceItTogether)

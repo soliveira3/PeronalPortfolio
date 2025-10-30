@@ -10,6 +10,7 @@
         "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
     },
     "dependencies": {
+        "vite": "^5.0.0",
         "axios": "^1.12.2",
         "lucide-react": "^0.546.0",
         "react": "^19.1.1",
