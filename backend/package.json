@@ -1,26 +1,23 @@
 {
-    "name": "portfolio-backend",
+    "name": "backend",
     "version": "1.0.0",
-    "description": "Backend for Samuel Oliveira's portfolio",
     "main": "src/server.js",
-    "type": "module",
     "scripts": {
-        "start": "node src/server.js",
         "dev": "nodemon src/server.js",
-        "seed": "node src/config/seed.js",
-        "build":"npm install && npm run build --prefix ../frontend"
+        "start": "node src/server.js"
     },
+    "type": "module",
     "keywords": [],
-    "author": "Samuel Oliveira",
+    "author": "",
     "license": "ISC",
+    "description": "",
     "dependencies": {
-        "@upstash/ratelimit": "^2.0.6",
-        "@upstash/redis": "^1.35.6",
+        "@upstash/ratelimit": "^2.0.5",
+        "@upstash/redis": "^1.34.9",
         "cors": "^2.8.5",
-        "dotenv": "^16.0.3",
-        "express": "^4.21.2",
-        "mongoose": "^7.8.7",
-        "react-router": "^7.9.4"
+        "dotenv": "^16.5.0",
+        "express": "^4.18.2",
+        "mongoose": "^8.14.3"
     },
     "devDependencies": {
         "nodemon": "^3.1.10"
