@@ -49,8 +49,6 @@ function ChessProblemSolver() {
                 ...formattedBoard.map(row => row.join(''))
             ].join('\n');
 
-            console.log('Sending to backend:', codeString);
-
             const response = await fetch('/api/pieceItTogether', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
