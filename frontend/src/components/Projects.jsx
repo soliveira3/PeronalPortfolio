@@ -25,7 +25,7 @@ function Projects() {
                                 <h2 className="card-title">Cow-BASIC</h2>
                                 <p>
                                     The Cow-BASIC compiler is a high-performance interpreter that uses matrix exponentiation to efficiently simulate variable updates in multiple nested loops.
-                                    A user can input multiple additive expressions inside multiple nested loops using the "Cow-BASIC" language. <span className="font-semibold italic">The compiler will ensure that code that would typically take years to run will now run in just a few seconds or less.</span>
+                                    A user can input multiple additive expressions inside multiple nested loops using the "Cow-BASIC" language. <span className="font-bold">The compiler will ensure that code that would typically take years to run will now run in just a few seconds or less.</span>
                                 </p>
 
                                 <div className="card-actions justify-start mb-10">
