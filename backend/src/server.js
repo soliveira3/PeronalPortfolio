@@ -1,5 +1,5 @@
 import express from 'express';
-import cors from 'cors';
+// import cors from 'cors';
 import dotenv from 'dotenv';
 import path from "path"
 
@@ -17,14 +17,17 @@ const port = process.env.PORT || 5000;
 const __dirname = path.resolve()
 connectDB();
 
-app.use(cors())
-app.use('/static', express.static(path.join(__dirname, 'src', 'public')));
+// app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(rateLimiter);
 
 
 // Routes
+app.post('/api/compile', cowBasicCompiler)
+app.post('/api/pieceItTogether', pieceItTogether)
+
+
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
@@ -32,10 +35,6 @@ if (process.env.NODE_ENV === "production") {
         res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
     });
 }
-
-
-app.post('/api/compile', cowBasicCompiler)
-app.post('/api/pieceItTogether', pieceItTogether)
 
 
 // Error Handling
