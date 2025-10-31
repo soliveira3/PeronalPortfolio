@@ -16,11 +16,9 @@ dotenv.config();
 const app = express();
 
 const port = process.env.PORT || 5000;
-// Resolve this module's directory reliably in ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Startup check: verify compiled middleware executables exist and are executable
 try {
     const mwDir = path.join(__dirname, 'middleware');
     const exes = ['cowBasicCompiler', 'pieceItTogether'];
@@ -50,11 +48,22 @@ app.post('/api/pieceItTogether', pieceItTogether)
 
 
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    const frontDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
 
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-    });
+    if (fs.existsSync(frontDist)) {
+        app.use(express.static(frontDist));
+
+        const indexPath = path.join(frontDist, 'index.html');
+        app.get('*', (req, res) => {
+            if (fs.existsSync(indexPath)) {
+                return res.sendFile(indexPath);
+            }
+            console.warn(`Frontend index not found at ${indexPath}`);
+            return res.status(404).send('Frontend build not found');
+        });
+    } else {
+        console.warn(`Frontend dist folder not found at ${frontDist}`);
+    }
 }
 
 
