@@ -2,6 +2,7 @@ import express from 'express';
 // import cors from 'cors';
 import dotenv from 'dotenv';
 import path from "path"
+import { spawn } from 'child_process';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
@@ -43,6 +44,66 @@ app.use(rateLimiter);
 
 
 // Routes
+// Health endpoint to run a quick test compile of both executables and return diagnostics
+app.get('/api/compiler-health', async (req, res) => {
+    const mwDir = path.join(__dirname, 'middleware');
+    const exes = ['cowBasicCompiler', 'pieceItTogether'];
+    const TIMEOUT_MS = parseInt(process.env.COMPILER_TIMEOUT_MS || '8000', 10);
+
+    const runOne = (name) => new Promise((resolve) => {
+        const exePath = path.join(mwDir, name);
+        const result = { name, exePath, exists: false, stdout: '', stderr: '', code: null, timedOut: false, error: null };
+        try {
+            if (!fs.existsSync(exePath)) {
+                result.error = 'not_found';
+                return resolve(result);
+            }
+            result.exists = true;
+            const child = spawn(exePath, [], { stdio: ['pipe', 'pipe', 'pipe'] });
+            const start = Date.now();
+            const killTimer = setTimeout(() => {
+                result.timedOut = true;
+                try { child.kill(); } catch (e) {}
+            }, TIMEOUT_MS);
+
+            child.stdout.on('data', (c) => { result.stdout += c.toString(); });
+            child.stderr.on('data', (c) => { result.stderr += c.toString(); });
+
+            child.on('error', (err) => {
+                clearTimeout(killTimer);
+                result.error = err.message;
+                result.code = null;
+                result.elapsedMs = Date.now() - start;
+                return resolve(result);
+            });
+
+            child.on('close', (code) => {
+                clearTimeout(killTimer);
+                result.code = code;
+                result.elapsedMs = Date.now() - start;
+                return resolve(result);
+            });
+
+            // send a tiny program that immediately returns; adjust to your language's expected input
+            const testInput = 'R 0\n';
+            child.stdin.write(testInput);
+            child.stdin.end();
+        } catch (e) {
+            result.error = e.message;
+            return resolve(result);
+        }
+    });
+
+    const results = [];
+    for (const name of exes) {
+        // eslint-disable-next-line no-await-in-loop
+        const r = await runOne(name);
+        results.push(r);
+    }
+
+    return res.json({ results, TIMEOUT_MS });
+});
+
 app.post('/api/compile', cowBasicCompiler)
 app.post('/api/pieceItTogether', pieceItTogether)
 
