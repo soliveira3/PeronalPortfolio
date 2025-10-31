@@ -4,6 +4,8 @@ import { BrowserRouter } from "react-router"
 import { Toaster } from "react-hot-toast"
 import './index.css'
 import App from './App.jsx'
+import ScrollToTop from './components/ScrollToTop';
+
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

@@ -2,7 +2,6 @@ import { Routes, Route } from 'react-router';
 import Home from './pages/Home';
 import CowBasic from './pages/CowBasic';
 import PieceItTogether from './pages/PieceItTogether';
-import ScrollToTop from './components/ScrollToTop';
 
 
 const App = () => {
