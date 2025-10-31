@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import toast from 'react-hot-toast';
 import { ArrowDownIcon } from "lucide-react";
+import resumePdf from './assets/resume.pdf'
 
 
 function Hero() {
@@ -41,7 +42,7 @@ function Hero() {
 
                     <a
                         target="_blank"
-                        href="http://localhost:5000/static/resume.pdf"
+                        href={resumePdf}
                         className='btn btn-neutral'
                     >Resume</a>
 

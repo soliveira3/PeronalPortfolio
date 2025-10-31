@@ -51,7 +51,7 @@ function ChessProblemSolver() {
 
             console.log('Sending to backend:', codeString);
 
-            const response = await fetch('http://localhost:5000/api/pieceItTogether', {
+            const response = await fetch('/api/pieceItTogether', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: codeString }),
