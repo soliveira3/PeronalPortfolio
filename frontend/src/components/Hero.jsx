@@ -61,7 +61,7 @@ function Hero() {
                         target="_blank"
                         href="https://codeforces.com/profile/soliveira27"
                         className="btn btn-neutral"
-                    >CodeForces</a>
+                    >Codeforces</a>
 
                 </div>
 
