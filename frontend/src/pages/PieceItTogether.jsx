@@ -4,7 +4,18 @@ import { Link } from "react-router"
 
 function ChessProblemSolver() {
     const [boardSize, setBoardSize] = useState(8);
-    const [board, setBoard] = useState(Array(8).fill().map(() => Array(8).fill(null)));
+    const initialPattern = [
+        '........',
+        '.W......',
+        '.BW.....',
+        '.....W..',
+        '...BWBW.',
+        '...WBW..',
+        '..WBW...',
+        '...W....',
+    ];
+    const parsePattern = (pattern) => pattern.map(row => row.split('').map(ch => ch === '.' ? null : (ch === 'W' ? 'white' : 'black')));
+    const [board, setBoard] = useState(() => parsePattern(initialPattern));
     const [result, setResult] = useState(null);
     const [time, setTime] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
