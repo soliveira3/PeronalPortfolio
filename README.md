@@ -19,5 +19,3 @@ A competitive programming gallery with visualizations of complex C++ solutions.
 - Written in C++ for the algorithmic solutions  
 - scripts for rendering or generating visualizations  
 - Hosted in the `backend/` directory
-- 
----
