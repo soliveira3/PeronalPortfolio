@@ -2,6 +2,8 @@ import express from 'express';
 // import cors from 'cors';
 import dotenv from 'dotenv';
 import path from "path"
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 import rateLimiter from './middleware/rateLimiter.js';
 import { connectDB } from './config/db.js';
@@ -14,7 +16,26 @@ dotenv.config();
 const app = express();
 
 const port = process.env.PORT || 5000;
-const __dirname = path.resolve()
+// Resolve this module's directory reliably in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Startup check: verify compiled middleware executables exist and are executable
+try {
+    const mwDir = path.join(__dirname, 'middleware');
+    const exes = ['cowBasicCompiler', 'pieceItTogether'];
+    exes.forEach((name) => {
+        const p = path.join(mwDir, name);
+        try {
+            fs.accessSync(p, fs.constants.X_OK);
+            console.log(`Found executable: ${p}`);
+        } catch (e) {
+            console.warn(`Executable missing or not executable: ${p} -- ${e.message}`);
+        }
+    });
+} catch (e) {
+    console.warn('Middleware startup check failed:', e.message);
+}
 connectDB();
 
 // app.use(cors())
