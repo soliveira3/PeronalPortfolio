@@ -72,10 +72,10 @@ function Hero() {
                         className="btn btn-outline btn-primary"
                     >321-326-0292</button>
 
-                    <button
-                        onClick={() => copyToClipboard('sam.l.olive05@gmail.com', 'Email')}
+
+                    <a href="mailto:sam.lolive05@gmail.com"
                         className="btn btn-outline btn-primary"
-                    > sam.l.olive05@gmail.com</button>
+                    >sam.l.olive05@gmail.com</a>
                 </div>
 
 

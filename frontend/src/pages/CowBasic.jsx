@@ -69,6 +69,9 @@ function CowBasic() {
                         The Cow-BASIC compiler is a high-performance C++ interpreter that executes a minimalist, arithmetically-focused, programming language designed for rapid nested loop computations.
                         Under the hood, the compiler transforms Cow-BASIC code into matrix transformations and uses matrix exponentiation to efficiently simulate variable updates in multiple nested “MOO” loops.
                     </p>
+                    <p className='ml-10 mb-5 font-bold'>
+                        The sample code given would normally run in about 4 months, but here, it will run in less than a second
+                    </p>
                     <p className='ml-10 mb-5'>This program was inspired by this USA Olympiad problem:
                         <Link target="_blank" to="https://usaco.org/index.php?page=viewproblem2&cpid=746" className="underline ml-3 mb-1">Cow-BASIC - USACO</Link>
                     </p>
