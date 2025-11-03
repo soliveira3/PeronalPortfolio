@@ -4,7 +4,18 @@ import { Link } from "react-router"
 
 function ChessProblemSolver() {
     const [boardSize, setBoardSize] = useState(8);
-    const [board, setBoard] = useState(Array(8).fill().map(() => Array(8).fill(null)));
+    const initialPattern = [
+        '........',
+        '.W......',
+        '.BW.....',
+        '.....W..',
+        '...BWBW.',
+        '...WBW..',
+        '..WBW...',
+        '...W....',
+    ];
+    const parsePattern = (pattern) => pattern.map(row => row.split('').map(ch => ch === '.' ? null : (ch === 'W' ? 'white' : 'black')));
+    const [board, setBoard] = useState(() => parsePattern(initialPattern));
     const [result, setResult] = useState(null);
     const [time, setTime] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
@@ -49,9 +60,7 @@ function ChessProblemSolver() {
                 ...formattedBoard.map(row => row.join(''))
             ].join('\n');
 
-            console.log('Sending to backend:', codeString);
-
-            const response = await fetch('http://localhost:5000/api/pieceItTogether', {
+            const response = await fetch('/api/pieceItTogether', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code: codeString }),

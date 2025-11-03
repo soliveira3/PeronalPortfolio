@@ -1,121 +1,182 @@
 #include <bits/stdc++.h>
 using namespace std;
-#define rep(i, a, b) for (ll i = a; i < (ll)(b); ++i)
-#define all(x) (x).begin(), (x).end()
-#define sz(x) (ll) x.size()
-typedef long long ll;
-typedef pair<ll, ll> pll;
-typedef vector<ll> vll;
+using ll = long long;
 
+static const ll mod = 1000000007LL;
 
-ll mod = 1e9+7;
+struct Matrix {
+    int n;
+    vector<ll> d; // flat n*n row-major
+    Matrix() : n(0) {}
+    Matrix(int _n) : n(_n), d((size_t)n * n) {}
 
+    inline ll& at(int i, int j) { return d[(size_t)i * n + j]; }
+    inline const ll& at(int i, int j) const { return d[(size_t)i * n + j]; }
 
-template<class T, int N> struct Matrix {
-	typedef Matrix M;
-	array<array<T, N>, N> d{};
-	M operator*(const M& m) const {
-		M a;
-		rep(i,0,N) rep(j,0,N)
-			rep(k,0,N) a.d[i][j] = (a.d[i][j] + d[i][k]*m.d[k][j]) % mod;
-		return a;
-	}
-	array<T, N> operator*(const array<T, N>& vec) const {
-		array<T, N> ret{};
-		rep(i,0,N) rep(j,0,N) ret[i] = (ret[i] + d[i][j] * vec[j]) % mod;
-		return ret;
-	}
-    M operator+(const M& m) const {
-		M a;
-		rep(i,0,N) rep(j,0,N)
-			a.d[i][j] = (d[i][j]+m.d[i][j]) % mod;
-		return a;
-	}
-	M operator^(ll p) const {
-		assert(p >= 0);
-		M a, b(*this);
-		rep(i,0,N) a.d[i][i] = 1;
-		while (p) {
-			if (p&1) a = (a*b);
-			b = (b*b);
-			p >>= 1;
-		}
-		return a;
-	}
+    static Matrix identity(int n) {
+        Matrix I(n);
+        for (int i = 0; i < n; ++i) I.at(i,i) = 1;
+        return I;
+    }
+
+    Matrix operator*(const Matrix& b) const {
+        const Matrix &a = *this;
+        int N = a.n;
+        Matrix c(N);
+        // i,k,j loop order with 128-bit accumulation
+        for (int i = 0; i < N; ++i) {
+            for (int k = 0; k < N; ++k) {
+                ll aik = a.at(i,k);
+                if (aik == 0) continue;
+                for (int j = 0; j < N; ++j) {
+                    c.at(i,j) = (c.at(i,j) + (__int128)aik * b.at(k,j)) % mod;
+                }
+            }
+        }
+        return c;
+    }
+
+    vector<ll> multiplyVec(const vector<ll>& vec) const {
+        int N = n;
+        vector<ll> ret(N);
+        for (int i = 0; i < N; ++i) {
+            __int128 acc = 0;
+            for (int j = 0; j < N; ++j) acc += (__int128)at(i,j) * vec[j];
+            ret[i] = (ll)(acc % mod);
+        }
+        return ret;
+    }
+
+    Matrix operator+(const Matrix& m) const {
+        Matrix a(n);
+        for (int i = 0; i < n*n; ++i) a.d[i] = (d[i] + m.d[i]) % mod;
+        return a;
+    }
+
+    Matrix powll(long long p) const {
+        assert(p >= 0);
+        Matrix a = identity(n);
+        Matrix b = *this;
+        while (p) {
+            if (p & 1) a = a * b;
+            b = b * b;
+            p >>= 1;
+        }
+        return a;
+    }
 };
 
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
+    vector<string> lines;
+    string s;
+    while (std::getline(cin, s)) {
+        if (!s.empty() && s.back() == '\r') s.pop_back();
+        lines.push_back(s);
+    }
 
-int main()
-{
-    cin.tie(0)->sync_with_stdio(0);
-    cin.exceptions(cin.failbit);
-
-    // Storing the matrixes and what to exponentiate by
-    Matrix<ll, 101> A, IDENTITY, curMat;
-    rep (i, 0, 101) IDENTITY.d[i][i] = 1;
-    curMat = IDENTITY;
-    vector<pair<Matrix<ll, 101>, ll>> matrixes;
-    map<string, ll> mp;
-    string s, t;
-
-    auto start = chrono::high_resolution_clock::now();
-
-    ll lineNum = 0;
-    while (1)
-    {
-        getline(cin, s);
-        stringstream str(s);
-        str >> t;
-        lineNum++;
-
-        // Return Statement
+    map<string,int> mp;
+    for (const auto &line : lines) {
+        stringstream ss(line);
+        string t;
+        if (!(ss >> t)) continue;
+        if (t.size() >= 2 && t.substr(0,2) == "//") continue;
+        if (t[0] >= '0' && t[0] <= '9') continue; // MOO header
+        if (t == "}") continue;
         if (t[0] == 'R') {
-            str >> t;
-            array<ll, 101> res;
-            rep (i, 0, 101) res[i] = 1;
-            res = curMat*res;
-            cout << res[mp[t]] << '\n';
+            string var;
+            if (ss >> var) {
+                if (mp.find(var) == mp.end()) mp[var] = (int)mp.size()+1;
+            }
             break;
         }
 
-        // Commented Line
-        if (sz(t) >= 2 && t.substr(0,2) == "//")
-            continue;
+        if (mp.find(t) == mp.end()) mp[t] = (int)mp.size()+1;
+        string tok;
+        while (ss >> tok) {
+            if (tok.empty()) continue;
+            char c = tok[0];
+            if (c == ')' || c == '(' || c == '+' || c == '=') continue;
+            if (c >= '0' && c <= '9') continue;
+            if (mp.find(tok) == mp.end()) mp[tok] = (int)mp.size()+1;
+        }
+    }
 
-        // we are in a MOO loop
-        if (t[0] >= '0' && t[0] <= '9') {
-            matrixes.push_back({curMat, stoll(t)});
-            curMat = IDENTITY;
+    int N = (int)mp.size() + 1;
+    Matrix IDENTITY = Matrix::identity(N);
+    Matrix curMat = IDENTITY;
+    vector<pair<Matrix,long long>> matrixes;
+
+    auto start = chrono::high_resolution_clock::now();
+
+    for (const auto &line : lines) {
+        stringstream str(line);
+        string t;
+        if (!(str >> t)) continue;
+
+        // Return Statement
+        if (t[0] == 'R') {
+            string var;
+            if (str >> var) {
+                vector<ll> res(N,1);
+                res = curMat.multiplyVec(res);
+                int idx = mp[var];
+                cout << res[idx] << '\n';
+            }
+            break;
         }
 
-        // Ending a MOO loop
-        else if (t == "}") {
-            // expo
-            curMat = curMat^matrixes.back().second;
-            curMat = curMat * matrixes.back().first;
+        // Comment
+        if (t.size() >= 2 && t.substr(0,2) == "//") continue;
+
+        // MOO loop start
+        if (t[0] >= '0' && t[0] <= '9') {
+            long long times = stoll(t);
+            matrixes.push_back({curMat, times});
+            curMat = IDENTITY;
+            continue;
+        }
+
+        // End of MOO
+        if (t == "}") {
+            auto &pr = matrixes.back();
+            Matrix exp = pr.first; // outer matrix
+            long long times = pr.second;
+            // curMat ^ times then multiply by outer
+            Matrix powered = curMat.powll(times);
+            curMat = powered * exp;
             matrixes.pop_back();
+            continue;
         }
 
         // Expression
-        else {
-            if (mp.find(t) == mp.end()) mp[t] = sz(mp)+1;
-            ll idx = mp[t];
-            Matrix<ll, 101> tmp = IDENTITY;
-            tmp.d[idx][idx] = 0;
+        if (mp.find(t) == mp.end()) mp[t] = (int)mp.size()+1;
+        int idx = mp[t];
+        Matrix tmp = IDENTITY;
+        tmp.at(idx, idx) = 0;
 
-            while (str >> t) {
-                if (t[0] == ')' || t[0] == '(' || t[0] == '+' || t[0] == '=') continue;
-                if (t[0] >= '0' && t[0] <= '9') tmp.d[idx][0] += (ll)stoll(t);
-                else tmp.d[idx][mp[t]]++;
+        string tok;
+        while (str >> tok) {
+            if (tok.empty()) continue;
+            char c = tok[0];
+            if (c == ')' || c == '(' || c == '+' || c == '=') continue;
+            if (c >= '0' && c <= '9') {
+                ll val = stoll(tok);
+                tmp.at(idx, 0) = (tmp.at(idx,0) + val) % mod;
+            } else {
+                int j = mp[tok];
+                tmp.at(idx, j) = (tmp.at(idx,j) + 1) % mod;
             }
-
-            curMat = tmp * curMat;
         }
 
+        curMat = tmp * curMat;
     }
 
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> elapsed = end - start;
     cerr << "Runtime: " << elapsed.count() << "\n";
+
+    return 0;
 }
